@@ -507,24 +507,6 @@ def main():
     # Define engine configurations
     engine_configs = []
     
-    if ENGINES_AVAILABLE['coreml']:
-        engine_configs.extend([
-            ('CoreML', 'CPU', CoreMLProfiler(compute_unit='CPU', warmup_runs=args.warmup, benchmark_runs=args.benchmark)),
-            ('CoreML', 'ANE', CoreMLProfiler(compute_unit='ANE', warmup_runs=args.warmup, benchmark_runs=args.benchmark)),
-            ('CoreML', 'GPU', CoreMLProfiler(compute_unit='GPU', warmup_runs=args.warmup, benchmark_runs=args.benchmark)),
-        ])
-    
-    if ENGINES_AVAILABLE['onnx']:
-        engine_configs.append(
-            ('ONNX', 'CPU', ONNXProfiler(provider='CPUExecutionProvider', warmup_runs=args.warmup, benchmark_runs=args.benchmark))
-        )
-        # Check if DML provider is available
-        available_providers = ort.get_available_providers()
-        if 'DmlExecutionProvider' in available_providers:
-            engine_configs.append(
-                ('ONNX', 'DML', ONNXProfiler(provider='DmlExecutionProvider', warmup_runs=args.warmup, benchmark_runs=args.benchmark))
-            )
-    
     if ENGINES_AVAILABLE['openvino']:
         ov_core = Core()
         available_devices = ov_core.available_devices
@@ -535,11 +517,6 @@ def main():
         if 'NPU' in available_devices:
             engine_configs.append(
                 ('OpenVINO', 'NPU', OpenVINOProfiler(device='NPU', warmup_runs=args.warmup, benchmark_runs=args.benchmark))
-            )
-        # Always add CPU as fallback
-        if 'CPU' in available_devices:
-            engine_configs.append(
-                ('OpenVINO', 'CPU', OpenVINOProfiler(device='CPU', warmup_runs=args.warmup, benchmark_runs=args.benchmark))
             )
     
     # Profile each configuration
